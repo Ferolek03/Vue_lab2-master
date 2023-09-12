@@ -30,7 +30,23 @@ Vue.component('container', {
         if (localStorage.thirdCol) {
             this.thirdCol = JSON.parse(localStorage.thirdCol)
         }
-
+        eventBus.$on('move-column2', (idNote, note) => {
+            if (this.secondCol.length < 5) {
+                if (this.firstCol[idNote].doneNum >= 50) {
+                    this.secondCol.push(this.firstCol[idNote])
+                    this.firstCol.splice(idNote, 1)
+                    this.save()
+                }
+            }
+        });
+        eventBus.$on('move-column3', (idNote, note) => {
+            if (this.secondCol[idNote].doneNum === 100) {
+                this.time(idNote)
+                this.thirdCol.push(this.secondCol[idNote])
+                this.secondCol.splice(idNote, 1)
+                this.save()
+            }
+        })
     },
     template: `
     <div>
@@ -44,6 +60,101 @@ Vue.component('container', {
     `,
 })
 
+Vue.component('column1', {
+    props: {
+        firstCol: {
+            type: Array,
+            required: true
+        },
+    },
+    data() {
+        return {}
+    },
+    mounted() {
+        eventBus.$on('on-submit', createNote => {
+            if (this.firstCol.length < 3) {
+                this.firstCol.push(createNote)
+                this.save()
+            }
+        })
+    },
+    methods: {
+        save() {
+            localStorage.firstCol = JSON.stringify(this.firstCol)
+        },
+    },
+    template: `
+     <div>
+        <note v-for="(note, index) in firstCol" @save="save()" :firstCol="firstCol" :key="note.key" :idNote="index" :note="note">
+            
+        </note>
+    </div>
+    `,
+})
+
+Vue.component('note', {
+    props: {
+        note: {
+            type: Object,
+        },
+        idNote: {
+            type: Number,
+        },
+    },
+    data() {
+        return {
+            taskTitle: null,
+            isDone: false,
+            doneNum: 0
+        }
+    },
+    methods: {
+        addTask() {
+            if (this.taskTitle && this.note.tasks.length < 5) {
+                let createTask = {
+                    taskTitle: this.taskTitle,
+                    isDone: false
+                }
+                this.note.tasks.push(createTask);
+                this.taskTitle = '';
+                this.$emit('save')
+            }
+        },
+    },
+    mounted() {
+        eventBus.$on('update-checkbox', idNote => {
+            let doneCount = 0;
+            let notDoneCount = 0;
+            let allTasksCount = 0;
+            for (let task of this.note.tasks) {
+                allTasksCount++;
+                if (task.isDone === true) {
+                    doneCount++;
+                } else {
+                    notDoneCount++;
+                }
+            }
+            this.note.doneNum = (doneCount / (doneCount + notDoneCount)) * 100;
+            if (this.note.doneNum > 50) eventBus.$emit('move-column2', idNote, this.note);
+            if (this.note.doneNum === 100) eventBus.$emit('move-column3', idNote, this.note);
+        })
+    },
+    template: `
+    <div class="todo-card todo-item">
+        <div class="todo-title">
+            <span>{{ note.title }}</span>
+        </div>
+        <task v-for="(task, key) in note.tasks" :key="key" :task="task" :idNote="idNote"></task>
+        <form class="add-task-form" v-show="this.note.tasks.length < 5 && this.note.doneNum !== 100" @submit.prevent="addTask">
+            <input class="task-title-input" placeholder="Добавить заметку" v-model="taskTitle" type="text">
+            <input class="submit-btn" type="submit" value="+">
+        </form>
+        <div class="date" v-if="note.date">
+            <span>Date - {{ note.date }}</span>
+            <span>Time - {{ note.time }}</span>
+        </div>
+    </div>`,
+})
 
 Vue.component('task', {
     props: {
