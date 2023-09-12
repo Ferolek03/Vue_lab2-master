@@ -92,6 +92,30 @@ Vue.component('column1', {
     `,
 })
 
+Vue.component('column2', {
+    props: {
+        secondCol: {
+            type: Array,
+            required: true
+        }
+    },
+    data() {
+        return {}
+    },
+    methods: {
+        save() {
+            localStorage.secondCol = JSON.stringify(this.secondCol)
+        }
+    },
+    template: `
+     <div>
+        <note v-for="(note, index) in secondCol" @save="save()" :secondCol="secondCol" :key="note.key" :idNote="index" :note="note">
+            
+        </note>
+    </div>
+    `,
+})
+
 Vue.component('note', {
     props: {
         note: {
