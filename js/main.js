@@ -1,5 +1,118 @@
 let eventBus = new Vue();
 
+Vue.component('container', {
+    data() {
+        return {
+            firstCol: [],
+            secondCol: [],
+            thirdCol: [],
+        }
+    },
+    methods: {
+        save() {
+            localStorage.firstCol = JSON.stringify(this.firstCol)
+            localStorage.secondCol = JSON.stringify(this.secondCol)
+            localStorage.thirdCol = JSON.stringify(this.thirdCol)
+        },
+        time(idNote) {
+            let timeData = new Date();
+            this.secondCol[idNote].time = timeData.getHours() + ':' + timeData.getMinutes();
+            this.secondCol[idNote].date = timeData.getDate() + '.' + timeData.getMonth() + '.' + timeData.getFullYear();
+        },
+    },
+    mounted() {
+        if (localStorage.firstCol) {
+            this.firstCol = JSON.parse(localStorage.firstCol)
+        }
+        if (localStorage.secondCol) {
+            this.secondCol = JSON.parse(localStorage.secondCol)
+        }
+        if (localStorage.thirdCol) {
+            this.thirdCol = JSON.parse(localStorage.thirdCol)
+        }
+
+    },
+    template: `
+    <div>
+        <create-form></create-form>
+        <div class="container">
+            <column1 :class="{ disabled: secondCol.length === 5 }" class="column column1" :firstCol="firstCol"></column1>
+            <column2 class="column column2" :secondCol="secondCol"></column2>
+            <column3 class="column column3" :thirdCol="thirdCol"></column3>
+        </div>
+    </div>
+    `,
+})
+
+
+Vue.component('task', {
+    props: {
+        task: {
+            type: Object
+        },
+        idNote: {
+            type: Number,
+        },
+    },
+    data() {
+        return {}
+    },
+    methods: {
+        updateCounter() {
+            this.task.isDone = !this.task.isDone
+            eventBus.$emit('update-checkbox', this.idNote)
+        }
+    },
+    mounted() {
+
+    },
+    template: `
+    <div class="task">
+        <span class="task-title">{{ task.taskTitle }}</span>
+        <button :class="{done: task.isDone}" 
+        class="done-btn"
+        :disabled="task.isDone"
+        @click="updateCounter()">Добавить</button>
+    </div>`,
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Vue.component('create-form', {
     data() {
