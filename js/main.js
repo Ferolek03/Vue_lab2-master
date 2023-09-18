@@ -34,10 +34,7 @@ Vue.component('task', {
     <div class="list">
             <div class="note_title_block">
                 <h2 class="note_title">{{datas.request}}</h2>
-                <button class="del"
-                v-on:click="delNote()">
-                Delete
-                </button>
+               
             </div>
             <div class="tasks">
                 <div class="task" 
@@ -45,8 +42,8 @@ Vue.component('task', {
                     <div class="set_task">
                         <h3 class="title_task">
                         {{element.taskTitle}}
-                        <img id="deleteContent" v-if="id_column == 1 && datas.tasks.length >= 1" 
-                        v-on:click="deleteContent(elementId)" class="img" src="./css/remove.png">
+                        
+                        
                         </h3>
                         <input 
                         v-on:click="checkbox(elementId),
@@ -68,25 +65,18 @@ Vue.component('task', {
                         v-on:keyup.enter="addTask(),
                         column2MoveLeft()" 
                         v-model="taskTitle" placeholder="Добавить заметку">
-                    </div>
-                    <button class="input_button"
-                    v-on:click="addTask(),
+                      <button class="input_button"
+                              v-on:click="addTask(),
                     column2MoveLeft()">
-                    Добавить
-                    </button>
+                        Добавить
+                      </button>
+                    </div>
+                   
             </div>
         </div>
     </div>
     `,
     methods: {
-        deleteContent(id) {
-            if(this.datas.tasks.length > 1 && this.id_column == 1)
-                this.datas.tasks.splice(id,1)
-            this.save_task()
-        },
-        delNote() {
-            this.$emit('del_note')
-        },
         column1Move() {
             this.$emit('column1_move')
         },
