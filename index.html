@@ -1,19 +1,53 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>To do</title>
     <link rel="stylesheet" href="css/main.css">
-    <script defer src="js/vue.js"></script>
+    <script src="js/vue.js"></script>
     <script defer src="js/main.js"></script>
-    <title>Todo</title>
 </head>
 <body>
 <div id="app">
-    <container></container>
+    <div class="search">
+        <h1>Заметки</h1>
+        <form v-on:submit.prevent="forms">
+            <input v-model="request" :disabled="column1.arr.length === 3" placeholder="Название">
+            <input v-model="Task1" :disabled="column1.arr.length === 3" placeholder="1">
+            <input v-model="Task2" :disabled="column1.arr.length === 3" placeholder="2">
+            <input v-model="Task3" :disabled="column1.arr.length === 3" placeholder="3">
+            <input type="submit" value="Создать" class="add_button" :class="{disabled: column1.arr.length === 3}">
+        </form>
+    </div>
+    <br>
+    <div class="container">
+        <div class="column column1" :class="{disabled: about.signal}">
+            {{column1.task_id}}
+            <task
+                    v-on:del_note="del_1(index)"
+                    v-on:column1_move="left_colm(index)":arr="column1.arr":id_column="column1.task_id":about="about"
+                    :datas="datas"
+                    v-for="(datas, index) in column1.arr":key="index">
+            </task>
+        </div>
+        <div class="column column2">
+            {{column2.task_id}}
+            <task
+                    v-on:del_note="del_2(index)"
+                    v-on:column2_move="center_colm(index)" :id_column="column2.task_id" :about="about"
+                    v-on:column2_move_left="right_colm(index)":arr="column2.arr":datas="datas"
+                    v-for="(datas, index) in column2.arr":key="index">
+            </task>
+        </div>
+        <div class="column column3">
+            {{column3.task_id}}
+            <task
+                    v-on:del_note="del_3(index)":arr="column3.arr":datas="datas":id_column="column3.task_id":about="about"
+                    v-for="(datas, index) in column3.arr":key="index">
+            </task>
+        </div>
+    </div>
 </div>
 </body>
 </html>
